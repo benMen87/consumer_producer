@@ -8,6 +8,7 @@ pub enum Capacity {
 pub trait ConsumerProducer<T> where T: Copy {
     fn read(&mut self) -> Result<T, Capacity>;
     fn write(&mut self, data: T) -> Result<u8, Capacity>;
+    fn capacity(&self) -> usize;
 }
 
 pub struct CyclicBuffer<T> where T: Copy {
@@ -66,6 +67,10 @@ impl<T> ConsumerProducer<T> for CyclicBuffer<T> where T: Copy {
         self.data.insert(self.producer, data);
         self.producer = self.increment(self.producer);
         Ok(1)
+    }
+
+    fn capacity(&self) -> usize {
+        self.size - (self.producer - self.consumer)
     }
 }
 
